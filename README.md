@@ -1,13 +1,26 @@
-# Orator — AI-Powered Interview Question Generator
+<p align="center">
+  <h1 align="center">Orator 🎙️</h1>
+</p>
 
-> **Submitted for:** Nexoraa Technosolve IT Services Pvt. Ltd. — Java Full Stack Developer Technical Assessment
+<p align="center">
+  <a href="https://h55n.vercel.app">Live Demo</a> | <a href="https://github.com/h55n/orator">GitHub Repo</a> | <a href="#-setup-instructions">Installation</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/DOCS-H55N.VERCEL.APP-ffd700?style=for-the-badge" alt="Docs">
+  <img src="https://img.shields.io/badge/FRAMEWORK-SPRING_BOOT-6D4AE3?style=for-the-badge" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/FRONTEND-REACT-61DAFB?style=for-the-badge" alt="React">
+  <img src="https://img.shields.io/badge/DATABASE-MYSQL-4479A1?style=for-the-badge" alt="MySQL">
+  <img src="https://img.shields.io/badge/LICENSE-MIT-brightgreen?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/BUILT_BY-HASSAN_REHMAN-8a2be2?style=for-the-badge" alt="Built By">
+</p>
+
+<p align="center">
+  <strong>The AI-Powered Interview Question Generator.</strong> Built to dynamically generate targeted interview questions, assess your answers in real-time, and catch cheating attempts using Llama 3.
+</p>
+
+> **Submitted for:** Nexoraa Technosolve IT Services Pvt. Ltd. — Java Full Stack Developer Technical Assessment  
 > **Submission Deadline:** 07 August 2026
-
----
-
-## 🎥 App Demonstration
-
-![Orator App Demo](docs/images/demo_recording.webp)
 
 ---
 
