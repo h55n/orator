@@ -37,7 +37,7 @@
 | **Name**    | Hassan Rehman           |
 | **Phone**   | +91-8482984869       |
 | **Email**   | hassan0rehman@gmail.com           |
-| **Website** | h55n.vercel.app  |
+| **Website** | orator-ai.vercel.app  |
 | **GitHub**  | [https://github.com/h55n/orator] |
 
 ---
