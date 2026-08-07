@@ -1,0 +1,142 @@
+/* ============================================================
+   InterviewGen — Design Tokens
+   Based on: Ample Market Minimal Design System
+   Font: Labil Grotesk Variable (Google Fonts fallback: Inter)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600&display=swap');
+
+:root {
+  /* ── Colors ── */
+  --color-primary:        #111111;
+  --color-secondary:      #6B6B6B;
+  --color-tertiary:       rgba(17, 17, 17, 0.30);
+  --color-neutral:        #F6F5F3;
+  --color-surface:        #FFFFFF;
+  --color-on-surface:     #111111;
+  --color-error:          #D64545;
+  --color-border-subtle:  rgba(17, 17, 17, 0.05);
+  --color-card-accent:    #FFEF99;
+  --color-success:        #2D6A4F;
+  --color-info:           #1D3557;
+
+  /* ── Typography ── */
+  --font-family:          'Inter', 'Labil Grotesk Variable', -apple-system, sans-serif;
+
+  --text-display:         400 44px/44px var(--font-family);
+  --text-headline-lg:     400 34px/41px var(--font-family);
+  --text-headline-md:     400 27px/31px var(--font-family);
+  --text-headline-sm:     400 21px/25px var(--font-family);
+  --text-body-lg:         400 16px/24px var(--font-family);
+  --text-body-md:         400 15px/22px var(--font-family);
+  --text-body-sm:         400 14px/20px var(--font-family);
+  --text-label-lg:        450 14px/20px var(--font-family);
+  --text-label-md:        450 13px/18px var(--font-family);
+  --text-label-sm:        500 12px/16px var(--font-family);
+  --text-caption:         500 11px/14px var(--font-family);
+
+  --ls-display:           -1.76px;
+  --ls-headline-lg:       -0.4px;
+  --ls-headline-md:       -0.7px;
+  --ls-headline-sm:       -0.36px;
+  --ls-body-lg:           -0.16px;
+  --ls-body-md:           -0.12px;
+  --ls-body-sm:           -0.08px;
+  --ls-label-lg:          -0.04px;
+  --ls-label-md:          -0.02px;
+  --ls-label-sm:          0px;
+  --ls-caption:           0.02em;
+
+  /* ── Border Radius ── */
+  --radius-none:          0px;
+  --radius-sm:            4px;
+  --radius-md:            8px;
+  --radius-lg:            12px;
+  --radius-xl:            16px;
+  --radius-full:          9999px;
+
+  /* ── Spacing ── */
+  --space-xs:             8px;
+  --space-sm:             16px;
+  --space-md:             32px;
+  --space-lg:             56px;
+  --space-xl:             84px;
+  --space-xxl:            128px;
+
+  /* ── Shadows (minimal) ── */
+  --shadow-sm:            0 1px 3px rgba(17,17,17,0.06), 0 1px 2px rgba(17,17,17,0.04);
+  --shadow-md:            0 4px 12px rgba(17,17,17,0.08);
+
+  /* ── Transitions ── */
+  --transition-fast:      150ms ease;
+  --transition-base:      200ms ease;
+  --transition-slow:      300ms ease;
+
+  /* ── Z-index ── */
+  --z-nav:                100;
+  --z-modal:              200;
+  --z-toast:              300;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font: var(--text-body-md);
+  letter-spacing: var(--ls-body-md);
+  background-color: var(--color-neutral);
+  color: var(--color-on-surface);
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+}
+
+input, select, textarea {
+  font: var(--text-body-md);
+  letter-spacing: var(--ls-body-md);
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ── Utility Classes ── */
+.surface        { background-color: var(--color-surface); }
+.neutral-bg     { background-color: var(--color-neutral); }
+.accent-bg      { background-color: var(--color-card-accent); }
+.text-secondary { color: var(--color-secondary); }
+.text-error     { color: var(--color-error); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  clip: rect(0,0,0,0);
+  overflow: hidden;
+  white-space: nowrap;
+}
