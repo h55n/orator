@@ -24,6 +24,12 @@
 
 ---
 
+## 🎥 App Demonstration
+
+![Orator App Demo](docs/images/demo.gif)
+
+---
+
 ## 👤 Author
 
 | Field   | Details                        |
