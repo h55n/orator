@@ -114,4 +114,54 @@ OUTPUT FORMAT — return ONLY this JSON structure, no other text:
             default -> "- Match questions to the stated experience level.";
         };
     }
+
+    private static final String ASSESSMENT_SYSTEM_PROMPT = """
+You are an expert technical interviewer evaluating a candidate's practice interview session.
+You will be provided with a JSON array of questions and the candidate's answers.
+
+STRICT RULES:
+- Respond ONLY with valid JSON.
+- Be constructively critical but fair.
+- For every answer, detect if it reads like AI-generated text (robotic, overly structured, lack of personal voice) or if it looks suspiciously copy-pasted. Flag it with isAiGenerated and provide aiReasoning.
+- The overall score should be out of 100 based on technical accuracy, completeness, and clarity.
+""";
+
+    private static final String ASSESSMENT_USER_PROMPT = """
+Evaluate the following interview session:
+
+Session Context:
+Job Role: {JOB_ROLE}
+Technology: {TECHNOLOGY}
+Experience: {EXPERIENCE_LEVEL}
+
+Q&A Data:
+{QA_DATA}
+
+OUTPUT FORMAT — return ONLY this JSON structure:
+{
+  "overallScore": <int>,
+  "overallFeedback": "<string>",
+  "questionAssessments": [
+    {
+      "questionId": <long>,
+      "score": <int 0-10>,
+      "feedback": "<string>",
+      "isAiGenerated": <boolean>,
+      "aiReasoning": "<string>"
+    }
+  ]
+}
+""";
+
+    public String buildAssessmentSystemPrompt() {
+        return ASSESSMENT_SYSTEM_PROMPT;
+    }
+
+    public String buildAssessmentUserPrompt(String jobRole, String technology, String experienceLevel, String qaDataJson) {
+        return ASSESSMENT_USER_PROMPT
+                .replace("{JOB_ROLE}", jobRole)
+                .replace("{TECHNOLOGY}", technology)
+                .replace("{EXPERIENCE_LEVEL}", experienceLevel)
+                .replace("{QA_DATA}", qaDataJson);
+    }
 }

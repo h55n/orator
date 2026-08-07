@@ -35,6 +35,7 @@ api.interceptors.response.use(
 export const authService = {
   register: (data) => api.post('/auth/register', data),
   login:    (data) => api.post('/auth/login', data),
+  demoLogin:()     => api.post('/auth/demo'),
   me:       ()     => api.get('/auth/me'),
 }
 
@@ -46,6 +47,7 @@ export const questionService = {
   getSessionById: (sessionId) => api.get(`/questions/session/${sessionId}`),
   search: (params) => api.get('/questions/search', { params }),
   deleteSession: (sessionId) => api.delete(`/questions/session/${sessionId}`),
+  assessSession: (sessionId, data) => api.post(`/questions/session/${sessionId}/assess`, data),
 }
 
 // ── Favorites ─────────────────────────────────────────────────

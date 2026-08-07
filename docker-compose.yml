@@ -1,0 +1,47 @@
+services:
+
+  # ── MySQL 8 ───────────────────────────────────────────────────
+  mysql:
+    image: mysql:8
+    container_name: interviewgen-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: interviewgen_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── Spring Boot Backend ───────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: interviewgen-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/interviewgen_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      AI_PROVIDER: groq
+      AI_GROQ_API_KEY: ${GROQ_API_KEY}
+      AI_GROQ_BASE_URL: https://api.groq.com/openai/v1
+      AI_GROQ_MODEL: llama-3.3-70b-versatile
+      AI_GROQ_MAX_TOKENS: "4096"
+      AI_GROQ_TEMPERATURE: "0.7"
+      JWT_SECRET: dGhpcyBpcyBhIHNlY3VyZSByYW5kb20gc2VjcmV0IGtleSBmb3IgaW50ZXJ2aWV3Z2VuIGFwcA==
+      JWT_EXPIRATION_MS: "86400000"
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

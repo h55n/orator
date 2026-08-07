@@ -49,6 +49,23 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public AuthResponse loginDemo() {
+        String demoEmail = "demo@interviewgen.com";
+        User user = userRepository.findByEmail(demoEmail).orElseGet(() -> {
+            User newUser = User.builder()
+                    .name("Demo User")
+                    .email(demoEmail)
+                    .password(passwordEncoder.encode("demo1234"))
+                    .build();
+            return userRepository.save(newUser);
+        });
+        return AuthResponse.builder()
+                .token(jwtUtil.generateToken(user.getEmail()))
+                .user(toDto(user))
+                .build();
+    }
+
     public UserDto getProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));

@@ -25,6 +25,7 @@ public class QuestionService {
     private final UserRepository              userRepo;
     private final AiClient                    aiClient;
     private final PromptBuilder               promptBuilder;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     // ── Generate ──────────────────────────────────────────────
 
@@ -118,6 +119,7 @@ public class QuestionService {
                 .questionCount(questions.size())
                 .createdAt(session.getCreatedAt())
                 .questions(questions)
+                .assessmentData(session.getAssessmentData())
                 .build();
     }
 
@@ -128,7 +130,54 @@ public class QuestionService {
         User user = getUser(email);
         GenerationSession session = sessionRepo.findByIdAndUserId(sessionId, user.getId())
                 .orElseThrow(() -> new AppException("Session not found", HttpStatus.NOT_FOUND));
+        
+        favoriteRepo.deleteBySessionId(sessionId);
         sessionRepo.delete(session);
+    }
+
+    // ── Assess Session ────────────────────────────────────────
+
+    @Transactional
+    public AssessmentResponse assessSession(Long sessionId, AssessmentRequest req, String email) {
+        User user = getUser(email);
+        GenerationSession session = sessionRepo.findByIdAndUserId(sessionId, user.getId())
+                .orElseThrow(() -> new AppException("Session not found", HttpStatus.NOT_FOUND));
+
+        List<Question> questions = questionRepo.findBySessionId(sessionId);
+        
+        // Build QA data string for prompt
+        StringBuilder qaData = new StringBuilder();
+        for (Question q : questions) {
+            AnswerData ans = req.getAnswers().get(q.getId());
+            if (ans != null && ans.getText() != null && !ans.getText().isBlank()) {
+                qaData.append("Q ID: ").append(q.getId()).append("\n")
+                      .append("Question: ").append(q.getQuestion()).append("\n")
+                      .append("Answer: ").append(ans.getText()).append("\n")
+                      .append("Metrics: PasteCount=").append(ans.getPasteCount())
+                      .append(", TabSwitches=").append(ans.getTabSwitches()).append("\n\n");
+            }
+        }
+
+        if (qaData.length() == 0) {
+            throw new AppException("No answers provided for assessment", HttpStatus.BAD_REQUEST);
+        }
+
+        String systemPrompt = promptBuilder.buildAssessmentSystemPrompt();
+        String userPrompt = promptBuilder.buildAssessmentUserPrompt(
+            session.getJobRole(), session.getTechnology(), session.getExperienceLevel(), qaData.toString()
+        );
+
+        String rawContent = aiClient.chat(systemPrompt, userPrompt);
+        AssessmentResponse response = aiClient.parseAssessment(rawContent);
+
+        try {
+            session.setAssessmentData(objectMapper.writeValueAsString(response));
+            sessionRepo.save(session);
+        } catch (Exception e) {
+            log.error("Failed to serialize assessment data", e);
+        }
+
+        return response;
     }
 
     // ── Search ────────────────────────────────────────────────
@@ -185,6 +234,7 @@ public class QuestionService {
                 .categories(splitCategories(s.getCategories()))
                 .questionCount(s.getQuestionCount())
                 .createdAt(s.getCreatedAt())
+                .assessmentData(s.getAssessmentData())
                 .build();
     }
 

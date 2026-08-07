@@ -1,5 +1,8 @@
 package com.nexoraa.interviewgen.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -83,6 +86,7 @@ public class Dto {
         private Integer          questionCount;
         private LocalDateTime    createdAt;
         private List<QuestionDto> questions;
+        private String           assessmentData;
     }
 
     @Data @Builder @NoArgsConstructor @AllArgsConstructor
@@ -94,6 +98,7 @@ public class Dto {
         private List<String>     categories;
         private Integer          questionCount;
         private LocalDateTime    createdAt;
+        private String           assessmentData;
     }
 
     @Data @Builder @NoArgsConstructor @AllArgsConstructor
@@ -101,5 +106,37 @@ public class Dto {
         private int    status;
         private String message;
         private LocalDateTime timestamp;
+    }
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    public static class AnswerData {
+        private String text;
+        private int pasteCount;
+        private int tabSwitches;
+    }
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    public static class AssessmentRequest {
+        @NotNull
+        private java.util.Map<Long, AnswerData> answers;
+    }
+
+    @Data @Builder @NoArgsConstructor @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class QuestionAssessment {
+        private Long questionId;
+        private int score;
+        private String feedback;
+        @JsonProperty("isAiGenerated")
+        private boolean isAiGenerated;
+        private String aiReasoning;
+    }
+
+    @Data @Builder @NoArgsConstructor @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AssessmentResponse {
+        private int overallScore;
+        private String overallFeedback;
+        private List<QuestionAssessment> questionAssessments;
     }
 }

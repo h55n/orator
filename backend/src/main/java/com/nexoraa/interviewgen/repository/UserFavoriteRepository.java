@@ -24,4 +24,8 @@ public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long
     Page<UserFavorite> findByUserIdWithQuestion(@Param("userId") Long userId, Pageable pageable);
 
     long countByUserId(Long userId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM UserFavorite uf WHERE uf.question.session.id = :sessionId")
+    void deleteBySessionId(@Param("sessionId") Long sessionId);
 }

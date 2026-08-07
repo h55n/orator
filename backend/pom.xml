@@ -15,7 +15,7 @@
   <groupId>com.nexoraa</groupId>
   <artifactId>interviewgen</artifactId>
   <version>1.0.0</version>
-  <name>InterviewGen</name>
+  <name>Orator</name>
   <description>AI-powered Interview Question Generator</description>
 
   <properties>

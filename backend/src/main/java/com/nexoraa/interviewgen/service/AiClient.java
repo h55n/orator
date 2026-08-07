@@ -101,11 +101,7 @@ public class AiClient {
      */
     public List<Map<String, String>> parseQuestions(String rawContent) {
         try {
-            // Strip markdown code fences if present
-            String cleaned = rawContent.trim();
-            if (cleaned.startsWith("```")) {
-                cleaned = cleaned.replaceAll("^```[a-z]*\\n?", "").replaceAll("```$", "").trim();
-            }
+            String cleaned = extractJson(rawContent);
 
             JsonNode root      = mapper.readTree(cleaned);
             JsonNode questions  = root.path("questions");
@@ -141,5 +137,25 @@ public class AiClient {
             case "Easy", "Medium", "Hard" -> diff.trim();
             default -> "Medium";
         };
+    }
+
+    public com.nexoraa.interviewgen.dto.Dto.AssessmentResponse parseAssessment(String rawContent) {
+        try {
+            String cleaned = extractJson(rawContent);
+            return mapper.readValue(cleaned, com.nexoraa.interviewgen.dto.Dto.AssessmentResponse.class);
+        } catch (Exception e) {
+            log.error("Failed to parse AI Assessment response: {}", e.getMessage());
+            log.debug("Raw content: {}", rawContent);
+            throw new RuntimeException("Failed to parse AI assessment. Please try again.", e);
+        }
+    }
+
+    private String extractJson(String text) {
+        int start = text.indexOf('{');
+        int end = text.lastIndexOf('}');
+        if (start != -1 && end != -1 && end >= start) {
+            return text.substring(start, end + 1);
+        }
+        return text;
     }
 }

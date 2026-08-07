@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 
+import LandingPage     from './pages/LandingPage'
 import LoginPage       from './pages/LoginPage'
 import RegisterPage    from './pages/RegisterPage'
 import DashboardPage   from './pages/DashboardPage'
@@ -33,12 +34,12 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* Public */}
+          <Route path="/"         element={<GuestRoute><LandingPage /></GuestRoute>} />
           <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
           <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
 
           {/* Protected */}
           <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard"         element={<DashboardPage />} />
             <Route path="generate"          element={<GeneratePage />} />
             <Route path="session/:id"       element={<SessionPage />} />

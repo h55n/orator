@@ -43,6 +43,9 @@ public class GenerationSession {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "assessment_data", columnDefinition = "TEXT")
+    private String assessmentData;
+
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Question> questions;
 }

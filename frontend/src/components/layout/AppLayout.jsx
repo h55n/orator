@@ -1,86 +1,85 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import {
-  LayoutDashboard, Sparkles, History, Star,
-  LogOut, Menu, X, ChevronRight
-} from 'lucide-react'
+  SquaresFour, Sparkle, ClockCounterClockwise, Star,
+  SignOut, List, X, FileCode
+} from '@phosphor-icons/react'
 import './AppLayout.css'
 
-const NAV = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/generate',  icon: Sparkles,        label: 'Generate'  },
-  { to: '/history',   icon: History,          label: 'History'   },
-  { to: '/favorites', icon: Star,             label: 'Favorites' },
-]
-
 export default function AppLayout() {
-  const { user, logout }    = useAuth()
-  const navigate             = useNavigate()
-  const [open, setOpen]      = useState(false)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  const handleLogout = () => { logout(); navigate('/login') }
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
+  const navItems = [
+    { to: '/dashboard', icon: SquaresFour, label: 'Dashboard' },
+    { to: '/generate',  icon: Sparkle,     label: 'Generate' },
+    { to: '/history',   icon: ClockCounterClockwise, label: 'History' },
+    { to: '/favorites', icon: Star,        label: 'Favorites' }
+  ]
 
   return (
     <div className="app-layout">
-      {/* ── Mobile overlay ── */}
-      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
+      
+      {/* Mobile Toggle */}
+      <button 
+        className="mobile-menu-btn" 
+        onClick={() => setMobileOpen(!mobileOpen)}
+      >
+        {mobileOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
+      </button>
 
-      {/* ── Sidebar ── */}
-      <aside className={`sidebar ${open ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <div className="logo">
-            <span className="logo-icon">⬡</span>
-            <span className="logo-text">InterviewGen</span>
+      {/* Floating App Shell */}
+      <div className="app-shell">
+        
+        {/* Sidebar */}
+        <aside className={`app-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
+          <div className="sidebar-header">
+            <FileCode size={32} weight="duotone" className="brand-icon" />
+            <span className="font-serif italic text-3xl tracking-tight text-[var(--color-primary)]">Orator</span>
           </div>
-          <button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Close menu">
-            <X size={18} />
-          </button>
-        </div>
 
-        <nav className="sidebar-nav">
-          {NAV.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => setOpen(false)}
-            >
-              <Icon size={16} />
-              <span>{label}</span>
-              <ChevronRight size={14} className="nav-arrow" />
-            </NavLink>
-          ))}
-        </nav>
+          <nav className="sidebar-nav">
+            {navItems.map(item => (
+              <NavLink 
+                key={item.to} 
+                to={item.to} 
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <item.icon size={20} weight={location.pathname === item.to ? "fill" : "duotone"} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </nav>
 
-        <div className="sidebar-footer">
-          <div className="user-row">
-            <div className="user-avatar">{user?.name?.[0]?.toUpperCase() || 'U'}</div>
-            <div className="user-info">
-              <p className="user-name">{user?.name || 'User'}</p>
-              <p className="user-email">{user?.email || ''}</p>
-            </div>
+          <div className="sidebar-footer">
+            {user && (
+              <div className="user-badge" title={user.email}>
+                <div className="user-badge-dot"></div>
+                {user.email.split('@')[0]}
+              </div>
+            )}
+            
+            <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', padding: '10px 14px', borderRadius: '9999px', color: 'var(--color-error)' }} onClick={handleLogout}>
+              <SignOut size={20} weight="bold" />
+              <span>Log out</span>
+            </button>
           </div>
-          <button className="logout-btn" onClick={handleLogout} aria-label="Log out">
-            <LogOut size={16} />
-          </button>
-        </div>
-      </aside>
+        </aside>
 
-      {/* ── Main content ── */}
-      <div className="main-wrapper">
-        {/* Mobile topbar */}
-        <header className="mobile-topbar">
-          <button className="menu-toggle" onClick={() => setOpen(true)} aria-label="Open menu">
-            <Menu size={20} />
-          </button>
-          <span className="logo-text">InterviewGen</span>
-          <div className="user-avatar sm">{user?.name?.[0]?.toUpperCase() || 'U'}</div>
-        </header>
-
-        <main className="main-content">
+        {/* Main Content (Canvas) */}
+        <main className="app-main">
           <Outlet />
         </main>
+
       </div>
     </div>
   )

@@ -1,101 +1,98 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import toast from 'react-hot-toast'
+import { useLocation } from 'react-router-dom'
+import { TerminalWindow } from '@phosphor-icons/react'
 import './AuthPages.css'
 
 export default function LoginPage() {
-  const { login }  = useAuth()
-  const navigate   = useNavigate()
+  const { login, demoLogin } = useAuth()
+  const navigate    = useNavigate()
+  const location    = useLocation()
+  
   const [form, setForm]       = useState({ email: '', password: '' })
-  const [errors, setErrors]   = useState({})
   const [loading, setLoading] = useState(false)
+  const [demoLoading, setDemoLoading] = useState(false)
 
-  const validate = () => {
-    const e = {}
-    if (!form.email)    e.email    = 'Email is required'
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Invalid email'
-    if (!form.password) e.password = 'Password is required'
-    return e
+  const handleDemoLogin = async () => {
+    setDemoLoading(true)
+    try {
+      await demoLogin()
+      navigate('/dashboard')
+    } catch (err) {
+      toast.error('Demo login failed')
+    } finally {
+      setDemoLoading(false)
+    }
   }
+
+  // Auto-trigger demo login if query param ?demo=true is present
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('demo') === 'true') {
+      handleDemoLogin()
+    }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const errs = validate()
-    if (Object.keys(errs).length) { setErrors(errs); return }
     setLoading(true)
     try {
       await login(form)
       navigate('/dashboard')
     } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid credentials'
-      toast.error(msg)
+      toast.error(err.response?.data?.message || 'Login failed')
     } finally {
       setLoading(false)
     }
   }
 
-  const set = (field) => (e) => {
-    setForm(f => ({ ...f, [field]: e.target.value }))
-    if (errors[field]) setErrors(er => ({ ...er, [field]: '' }))
-  }
-
   return (
     <div className="auth-shell">
-      <div className="auth-brand">
-        <span className="auth-logo-icon">⬡</span>
-        <span className="auth-logo-text">InterviewGen</span>
-      </div>
-
-      <div className="auth-card">
-        <div className="auth-card-header">
+      <div className="auth-card animate-fade-in">
+        
+        <div className="auth-header">
+          <div className="auth-brand">
+            <TerminalWindow size={32} weight="duotone" />
+          </div>
           <h1 className="auth-title">Welcome back</h1>
-          <p className="auth-subtitle">Sign in to your account to continue</p>
+          <p className="auth-subtitle">Sign in to continue your practice.</p>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="auth-fields">
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                className={`form-input ${errors.email ? 'error' : ''}`}
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={set('email')}
-                autoComplete="email"
-              />
-              {errors.email && <span className="form-error">{errors.email}</span>}
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">Password</label>
-              <input
-                id="password"
-                type="password"
-                className={`form-input ${errors.password ? 'error' : ''}`}
-                placeholder="••••••••"
-                value={form.password}
-                onChange={set('password')}
-                autoComplete="current-password"
-              />
-              {errors.password && <span className="form-error">{errors.password}</span>}
-            </div>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Email</label>
+            <input 
+              type="email" 
+              className="form-input"
+              value={form.email}
+              onChange={e => setForm({...form, email: e.target.value})}
+              required 
+            />
           </div>
-
-          <button type="submit" className="btn btn-primary btn-lg auth-submit" disabled={loading}>
-            {loading ? <span className="spinner" /> : 'Sign in'}
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input 
+              type="password" 
+              className="form-input"
+              value={form.password}
+              onChange={e => setForm({...form, password: e.target.value})}
+              required 
+            />
+          </div>
+          <button type="submit" className="btn btn-secondary auth-btn" disabled={loading || demoLoading}>
+            {loading ? <span className="spinner" /> : 'Sign In'}
+          </button>
+          <button type="button" className="btn btn-primary auth-btn mt-2" disabled={loading || demoLoading} onClick={handleDemoLogin}>
+            {demoLoading ? <span className="spinner" /> : 'Try Demo Experience'}
           </button>
         </form>
 
-        <p className="auth-footer">
-          Don't have an account?{' '}
+        <div className="auth-footer">
+          Don't have an account? 
           <Link to="/register" className="auth-link">Create one</Link>
-        </p>
+        </div>
       </div>
-
-      <p className="auth-tagline">AI-powered interview prep — free, fast, and focused.</p>
     </div>
   )
 }

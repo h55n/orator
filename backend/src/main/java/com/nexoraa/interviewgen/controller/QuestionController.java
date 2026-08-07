@@ -52,6 +52,15 @@ public class QuestionController {
         return ResponseEntity.noContent().build();
     }
 
+    /** Assess a session */
+    @PostMapping("/session/{id}/assess")
+    public ResponseEntity<AssessmentResponse> assessSession(
+            @PathVariable Long id,
+            @Valid @RequestBody AssessmentRequest req,
+            @AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(questionService.assessSession(id, req, user.getUsername()));
+    }
+
     /** Search across all questions */
     @GetMapping("/search")
     public ResponseEntity<Page<QuestionDto>> search(
