@@ -15,11 +15,11 @@
 
 | Field   | Details                        |
 |---------|-------------------------------|
-| **Name**    | [Your Full Name]           |
-| **Phone**   | [Your Phone Number]        |
-| **Email**   | [your@email.com]           |
-| **Website** | [https://yourwebsite.com]  |
-| **GitHub**  | [https://github.com/YOUR_USERNAME/orator] |
+| **Name**    | Hassan Rehman           |
+| **Phone**   | +91-8482984869       |
+| **Email**   | hassan0rehman@gmail.com           |
+| **Website** | h55n.vercel.app  |
+| **GitHub**  | [https://github.com/h55n/orator] |
 
 ---
 
