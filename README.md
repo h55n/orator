@@ -1,41 +1,400 @@
-# InterviewGen — AI-Powered Interview Question Generator
+# Orator — AI-Powered Interview Question Generator
 
-> Submitted for: Nexoraa Technosolve IT Services Pvt. Ltd. — Java Full Stack Developer Assessment
+> **Submitted for:** Nexoraa Technosolve IT Services Pvt. Ltd. — Java Full Stack Developer Technical Assessment
+> **Submission Deadline:** 07 August 2026
+
+---
+
+## 🎥 App Demonstration
+
+![Orator App Demo](docs/images/demo_recording.webp)
+
+---
+
+## 👤 Author
+
+| Field   | Details                        |
+|---------|-------------------------------|
+| **Name**    | [Your Full Name]           |
+| **Phone**   | [Your Phone Number]        |
+| **Email**   | [your@email.com]           |
+| **Website** | [https://yourwebsite.com]  |
+| **GitHub**  | [https://github.com/YOUR_USERNAME/orator] |
 
 ---
 
 ## 📌 Project Overview
 
-**InterviewGen** is a full-stack web application that generates targeted, categorized interview questions using free AI APIs (GROQ / NVIDIA NIM). Users register, configure their interview profile, and receive structured questions organized by category and difficulty — all for free.
+**Orator** is a full-stack web application that generates AI-driven, targeted interview questions based on a user's selected job role, technology, and experience level. The application goes well beyond the base requirements — it features a polished editorial UI design system, AI-powered self-assessment with cheating detection, practice mode with real-time timers, and a robust Spring Boot REST API secured with JWT authentication.
+
+> Built with Java 17, Spring Boot 3.2, React 18, Vite, MySQL 8, and free AI APIs (GROQ / NVIDIA NIM).
 
 ---
 
-## 🏗️ Technology Stack
+## 🎯 What Was Required vs. What Was Delivered
 
-| Layer       | Technology                                      |
-|-------------|-------------------------------------------------|
-| Backend     | Java 17, Spring Boot 3.2, Spring Security       |
-| Auth        | JWT (jjwt 0.12.5), BCrypt                      |
-| AI Provider | GROQ API (free) or NVIDIA NIM (free credits)   |
-| Frontend    | React 18, Vite, React Router v6                |
-| Database    | MySQL 8                                         |
-| HTTP Client | Spring WebFlux (WebClient) for AI API calls    |
-| Version Control | Git + GitHub                               |
+### ✅ All Required Features (From the Assessment Brief)
+
+| Requirement | Status |
+|---|---|
+| User Registration & Login | ✅ Implemented with JWT + BCrypt |
+| Select Job Role | ✅ Dropdown with 15 role options |
+| Select Technology/Skill | ✅ Dropdown with 25 technology options |
+| Select Experience Level (Fresher / Intermediate / Experienced) | ✅ Toggle chip selector |
+| Generate Interview Questions | ✅ AI-generated via GROQ Llama3 / NVIDIA NIM |
+| Categorize Questions (Technical, Coding, SQL, HR, Aptitude) | ✅ Multi-select with per-category distribution |
+| Difficulty Levels (Easy, Medium, Hard) | ✅ ~30% Easy / 45% Medium / 25% Hard |
+| Search and Filter Questions | ✅ Keyword search + category + difficulty filters |
+| Save Favorite Questions | ✅ Star/unstar per question, paginated favorites page |
+| View Previously Generated Questions (History) | ✅ Paginated session history with delete |
+| RESTful APIs using Spring Boot | ✅ 12+ endpoints, all documented below |
+| Responsive User Interface using React.js | ✅ Mobile-first, sidebar collapses on mobile |
+| MySQL Database Integration | ✅ JPA/Hibernate with schema.sql provided |
+| Proper Exception Handling and Input Validation | ✅ GlobalExceptionHandler + Bean Validation |
+
+### 🚀 Extra Features Added Beyond Requirements
+
+| Extra Feature | Description |
+|---|---|
+| **Practice Mode** | Full-screen timed interview simulation with per-question timer |
+| **AI Self-Assessment** | Submit answers and receive per-question AI scoring (0–10) with detailed written feedback |
+| **AI Cheating Detection** | Detects AI-generated or copy-pasted answers with flag + reasoning displayed on results |
+| **Paste Monitoring** | Paste events blocked in practice mode and counted for assessment scoring |
+| **Tab-Switch Detection** | Tracks tab switches during practice and factors them into assessment |
+| **Demo Login** | One-click demo access without registration |
+| **Export to PDF** | Browser print-to-PDF with clean print stylesheet |
+| **Copy Question Button** | One-click copy for any question |
+| **Orator Design System** | Full editorial design system: Instrument Serif + Outfit fonts, purple palette, floating app shell |
+| **Landing Page** | Marketing-grade landing page with hero, feature cards, and footer |
+| **Session Score Display** | Overall AI score shown on history cards and dashboard recent sessions |
+| **Docker Compose** | One-command `docker-compose up` for full local stack |
+| **Animated UI** | Stagger animations, fade-up cards, hover micro-interactions |
 
 ---
 
-## ✨ Features
+## 🏗️ Architecture Overview
 
-- ✅ User Registration & Login (JWT-secured)
-- ✅ Select Job Role, Technology/Skill, and Experience Level
-- ✅ AI-generated interview questions (GROQ Llama3 / NVIDIA Llama)
-- ✅ Question Categories: Technical, Coding, SQL, HR, Aptitude
-- ✅ Difficulty Levels: Easy, Medium, Hard
-- ✅ Save Favourite Questions
-- ✅ View & Delete Past Sessions (History)
-- ✅ Search & Filter Questions
-- ✅ Responsive UI (Ample Market Minimal design system)
-- ✅ 100% Free — no paid APIs required
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         BROWSER (React 18 + Vite)                   │
+│                                                                       │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  │
+│  │ LandingPage │  │ Auth Pages   │  │ App Layout   │  │ Pages    │  │
+│  │             │  │ Login /      │  │ (Sidebar +   │  │ Dashboard│  │
+│  │ Marketing   │  │ Register     │  │ Protected    │  │ Generate │  │
+│  │ Hero        │  │ Demo Login   │  │ Routes)      │  │ Session  │  │
+│  └─────────────┘  └──────────────┘  └──────────────┘  │ History  │  │
+│                                                         │ Favorites│  │
+│                    ┌─────────────────────────────────┐  └──────────┘  │
+│                    │         services/api.js          │               │
+│                    │  axios + JWT interceptor         │               │
+│                    │  authService | questionService   │               │
+│                    │  favoriteService | referenceService              │
+│                    └───────────────┬─────────────────┘               │
+└────────────────────────────────────┼────────────────────────────────┘
+                                     │ HTTP/REST (JWT Bearer)
+                    ┌────────────────▼─────────────────┐
+                    │      Spring Boot 3.2 Backend       │
+                    │                                    │
+                    │  ┌──────────┐  ┌───────────────┐  │
+                    │  │Security  │  │  Controllers  │  │
+                    │  │Config    │  │  Auth         │  │
+                    │  │JWT Filter│  │  Question     │  │
+                    │  │BCrypt    │  │  Favorite     │  │
+                    │  └──────────┘  │  Reference    │  │
+                    │                └───────┬───────┘  │
+                    │  ┌─────────────────────▼───────┐  │
+                    │  │          Services            │  │
+                    │  │  AuthService                │  │
+                    │  │  QuestionService             │  │
+                    │  │  FavoriteService             │  │
+                    │  │  AiClient  ←──────────────┐  │  │
+                    │  │  PromptBuilder             │  │  │
+                    │  └─────────────────────────────┘  │
+                    │                                    │
+                    │  ┌──────────────┐                  │
+                    │  │  JPA Repos   │                  │
+                    │  │  UserRepo    │                  │
+                    │  │  SessionRepo │                  │
+                    │  │  QuestionRepo│                  │
+                    │  │  FavoriteRepo│                  │
+                    │  └──────┬───────┘                  │
+                    └─────────┼──────────────────────────┘
+                              │ JDBC
+                    ┌─────────▼──────────┐     ┌──────────────────────┐
+                    │    MySQL 8          │     │   GROQ API           │
+                    │  interviewgen_db    │     │   (llama-3.3-70b)    │
+                    │                    │     │   OR                  │
+                    │  users             │     │   NVIDIA NIM          │
+                    │  generation_sessions│     │   (llama-3.1-70b)    │
+                    │  questions         │     └──────────────────────┘
+                    │  user_favorites    │
+                    └────────────────────┘
+```
+
+---
+
+## 🏛️ Technology Stack
+
+| Layer | Technology | Details |
+|---|---|---|
+| **Backend** | Java 17, Spring Boot 3.2 | REST API, Security, Validation |
+| **Auth** | Spring Security + JWT (jjwt 0.12.5) + BCrypt | Stateless JWT, 24h expiry |
+| **AI Provider** | GROQ API (free) or NVIDIA NIM (free credits) | OpenAI-compatible `/v1/chat/completions` |
+| **Frontend** | React 18, Vite, React Router v6 | SPA with protected routes |
+| **Styling** | Tailwind CSS v3 + Custom CSS Design System | Instrument Serif + Outfit fonts |
+| **Icons** | Phosphor Icons for React | Duotone icon set |
+| **HTTP Client (FE)** | Axios | JWT interceptor, 401 auto-redirect |
+| **HTTP Client (BE)** | Spring WebFlux WebClient | Non-blocking AI API calls |
+| **Database** | MySQL 8 | InnoDB, UTF8MB4, fulltext index |
+| **ORM** | Spring Data JPA + Hibernate | `ddl-auto=update` |
+| **Containerization** | Docker + Docker Compose | MySQL + Backend orchestrated |
+| **Build Tool** | Maven 3.8+ | Spring Boot Maven Plugin |
+| **Version Control** | Git + GitHub | Public repository |
+
+---
+
+## ✨ Feature Deep Dive
+
+### 1. Authentication System
+- JWT-based stateless authentication (24-hour tokens)
+- BCrypt password hashing (Spring Security default strength)
+- Auto-redirect to `/login` on 401 responses
+- Persistent login via `localStorage` with server-side token validation on mount
+- Demo login endpoint creates/reuses a shared demo account
+- `AuthProvider` context hook (`useAuth`) wraps the entire app
+
+### 2. AI Question Generation
+The `PromptBuilder` service constructs highly structured prompts engineered for consistency across any LLM:
+- **Role-primed system prompt** — model positioned as "senior technical interviewer with 15+ years experience"
+- **Explicit JSON schema** — forces structured output with exact field names
+- **Per-category distribution rules** — Technical, Coding, SQL, HR, Aptitude with specific guidelines
+- **Experience calibration blocks** — Fresher / Intermediate / Experienced guidance
+- **Difficulty anchoring** — Easy (recall), Medium (application), Hard (design/optimisation)
+- **Anti-hallucination guardrails** — no filler, no duplicates, real-world relevance
+- **Markdown fence handling** — `extractJson()` strips any accidental markdown from AI output
+
+### 3. Practice Mode
+A full-screen interview simulation environment:
+- Real-time countdown timer per session
+- One question displayed at a time with previous/next navigation
+- Paste detection — blocked with warning toast, paste count recorded
+- Tab-switch detection via `visibilitychange` API
+- Hint reveal toggle (so you can check if needed)
+- Progress bar showing completion percentage
+- Submit Assessment button on final question
+
+### 4. AI Self-Assessment
+After practice mode submission:
+- All answers sent to backend with paste count + tab switch metadata
+- `PromptBuilder.buildAssessmentUserPrompt()` passes full Q&A context to AI
+- AI returns: overall score (0–100), overall feedback, per-question score (0–10), detailed feedback
+- AI flags answers that appear generated or copy-pasted (`isAiGenerated: true`) with reasoning
+- Results persist in `generation_sessions.assessment_data` (JSON) and show on history cards
+
+### 5. Session History & Favorites
+- Paginated session list (10 per page) with delete capability
+- Sessions show: job role, technology, experience level, category chips, question count, date, AI score
+- Questions within sessions can be individually starred (saved to favorites)
+- Favorites page shows all starred questions with search, pagination, and one-click remove
+- Favorites persisted in `user_favorites` join table with unique constraint
+
+---
+
+## 📁 Project Structure
+
+```
+orator/
+├── backend/
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/main/
+│       ├── java/com/nexoraa/interviewgen/
+│       │   ├── InterviewGenApplication.java
+│       │   ├── config/
+│       │   │   └── AppConfig.java              ← ObjectMapper + WebClient beans
+│       │   ├── controller/
+│       │   │   ├── AuthController.java
+│       │   │   ├── QuestionController.java
+│       │   │   ├── FavoriteController.java
+│       │   │   └── ReferenceController.java
+│       │   ├── dto/
+│       │   │   └── Dto.java                    ← All nested static DTOs
+│       │   ├── entity/
+│       │   │   ├── User.java
+│       │   │   ├── GenerationSession.java
+│       │   │   ├── Question.java
+│       │   │   └── UserFavorite.java
+│       │   ├── exception/
+│       │   │   ├── AppException.java
+│       │   │   └── GlobalExceptionHandler.java
+│       │   ├── repository/
+│       │   │   ├── UserRepository.java
+│       │   │   ├── GenerationSessionRepository.java
+│       │   │   ├── QuestionRepository.java
+│       │   │   └── UserFavoriteRepository.java
+│       │   ├── security/
+│       │   │   ├── SecurityConfig.java         ← CORS, JWT filter chain
+│       │   │   └── JwtUtil.java
+│       │   └── service/
+│       │       ├── AuthService.java
+│       │       ├── QuestionService.java
+│       │       ├── FavoriteService.java
+│       │       ├── AiClient.java               ← GROQ/NVIDIA WebClient calls
+│       │       └── PromptBuilder.java          ← Prompt engineering
+│       └── resources/
+│           └── application.properties
+│
+├── frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   └── src/
+│       ├── App.jsx                             ← Router + protected routes
+│       ├── main.jsx
+│       ├── components/layout/
+│       │   ├── AppLayout.jsx                  ← Sidebar shell
+│       │   ├── AppLayout.css
+│       │   └── Footer.jsx
+│       ├── hooks/
+│       │   └── useAuth.jsx                    ← AuthContext + AuthProvider
+│       ├── pages/
+│       │   ├── LandingPage.jsx
+│       │   ├── LoginPage.jsx
+│       │   ├── RegisterPage.jsx
+│       │   ├── DashboardPage.jsx
+│       │   ├── GeneratePage.jsx
+│       │   ├── SessionPage.jsx                ← Review + Practice + Assessment
+│       │   ├── HistoryPage.jsx
+│       │   └── FavoritesPage.jsx
+│       ├── services/
+│       │   └── api.js                         ← All API calls + axios instance
+│       └── styles/
+│           ├── design-tokens.css              ← CSS custom properties
+│           └── global.css                     ← Base styles + component classes
+│
+├── docs/
+│   ├── schema.sql
+│   ├── CLAUDE_CODE_PROMPT.md
+│   └── README.md
+├── docker-compose.yml
+├── .gitignore
+└── orator-design.md                           ← Design system specification
+```
+
+---
+
+## 🗄️ Database Schema
+
+```sql
+-- Users table
+users (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(100) NOT NULL,
+  email       VARCHAR(255) NOT NULL UNIQUE,
+  password    VARCHAR(255) NOT NULL,          -- BCrypt hash
+  is_active   TINYINT(1) DEFAULT 1,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP
+)
+
+-- Generation sessions (one per "Generate" button click)
+generation_sessions (
+  id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id          BIGINT NOT NULL → users(id) CASCADE DELETE,
+  job_role         VARCHAR(100) NOT NULL,
+  technology       VARCHAR(100) NOT NULL,
+  experience_level VARCHAR(50) NOT NULL,
+  categories       VARCHAR(255) NOT NULL,    -- CSV: "Technical,Coding,HR"
+  question_count   INT DEFAULT 0,
+  created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+  assessment_data  TEXT                       -- JSON blob from AI assessment
+)
+
+-- Individual questions (children of sessions)
+questions (
+  id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+  session_id       BIGINT NOT NULL → generation_sessions(id) CASCADE DELETE,
+  question         TEXT NOT NULL,
+  hint             TEXT,
+  category         VARCHAR(50) NOT NULL,      -- Technical|Coding|SQL|HR|Aptitude
+  difficulty       VARCHAR(20) NOT NULL,      -- Easy|Medium|Hard
+  job_role         VARCHAR(100),
+  technology       VARCHAR(100),
+  experience_level VARCHAR(50),
+  created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FULLTEXT INDEX ft_questions_text (question)
+)
+
+-- Favorites (many-to-many: users ↔ questions)
+user_favorites (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id     BIGINT NOT NULL → users(id) CASCADE DELETE,
+  question_id BIGINT NOT NULL → questions(id) CASCADE DELETE,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_user_question (user_id, question_id)
+)
+```
+
+---
+
+## 📡 API Endpoints
+
+### Auth
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | ❌ | Register new user → returns JWT + user |
+| `POST` | `/api/auth/login` | ❌ | Login → returns JWT + user |
+| `POST` | `/api/auth/demo` | ❌ | Demo login (auto-creates demo account) |
+| `GET` | `/api/auth/me` | ✅ | Get current user profile |
+
+### Questions
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/questions/generate` | ✅ | Generate AI questions, persist session |
+| `GET` | `/api/questions/history?page=0&size=10` | ✅ | Paginated session history |
+| `GET` | `/api/questions/session/{id}` | ✅ | Full session with all questions |
+| `DELETE` | `/api/questions/session/{id}` | ✅ | Delete session (cascade deletes questions + favorites) |
+| `POST` | `/api/questions/session/{id}/assess` | ✅ | Submit answers for AI assessment |
+| `GET` | `/api/questions/search?keyword=&category=&difficulty=&technology=` | ✅ | Search/filter across all user's questions |
+
+### Favorites
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/favorites/{questionId}` | ✅ | Add question to favorites |
+| `DELETE` | `/api/favorites/{questionId}` | ✅ | Remove from favorites |
+| `GET` | `/api/favorites?page=0&size=20` | ✅ | Get paginated favorites list |
+
+### Reference Data
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/reference/job-roles` | ✅ | Get list of available job roles |
+| `GET` | `/api/reference/technologies` | ✅ | Get list of available technologies |
+
+---
+
+## 🎨 Design System — Orator Editorial
+
+The frontend uses a custom design system inspired by Tines' editorial aesthetic:
+
+| Token | Value |
+|---|---|
+| **Primary** | `#6D4AE3` (brand purple) |
+| **Primary 60** | `#8D75E6` (lighter lavender) |
+| **Primary 20** | `#E9E1FF` (pale lilac, chips/backgrounds) |
+| **Secondary** | `#F47E3F` (orange accent — used sparingly) |
+| **Tertiary** | `#5F3FC4` (deeper violet, hover states) |
+| **Neutral** | `#FCF9F5` (warm off-white page background) |
+| **Surface** | `#FFFFFF` (card backgrounds) |
+| **On-Surface** | `#5B47B6` (purple-toned text) |
+| **Border** | `#D7CCFF` (lavender borders) |
+| **Success** | `#1F7A57` |
+| **Error** | `#D94C3D` |
+| **Display Font** | Instrument Serif (italic, editorial headlines) |
+| **Body Font** | Outfit (300–700, clean geometric sans) |
+
+The app shell is a **floating card** design — a centered rounded container (`border-radius: 32px`) with a subtle purple gradient background, giving a polished SaaS feel.
 
 ---
 
@@ -44,183 +403,251 @@
 ### Prerequisites
 - Java 17+
 - Node.js 18+
-- MySQL 8+
+- MySQL 8+ (or Docker)
 - Maven 3.8+
-- GROQ API key (free at https://console.groq.com)
+- A free GROQ API key from [https://console.groq.com](https://console.groq.com)
 
 ---
 
-### 1. Database Setup
+### Option A — Docker Compose (Recommended)
 
+```bash
+# 1. Clone the repository
+git clone https://github.com/YOUR_USERNAME/orator.git
+cd orator
+
+# 2. Set your GROQ API key
+export GROQ_API_KEY=gsk_your_key_here
+
+# 3. Start MySQL + Backend
+docker-compose up -d
+
+# 4. Start Frontend
+cd frontend
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+### Option B — Manual Setup
+
+#### Step 1: Database Setup
 ```sql
--- Run docs/schema.sql in MySQL Workbench or CLI:
+-- In MySQL Workbench or CLI:
 mysql -u root -p < docs/schema.sql
 ```
 
----
+#### Step 2: Backend Configuration
 
-### 2. Backend Setup
+Edit `backend/src/main/resources/application.properties`:
 
-```bash
-cd backend
+```properties
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/interviewgen_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=YOUR_MYSQL_PASSWORD
 
-# Edit application.properties:
-# - Set spring.datasource.password=YOUR_MYSQL_PASSWORD
-# - Set ai.groq.api-key=YOUR_GROQ_API_KEY
-# - Set jwt.secret=<base64 encoded 256-bit key>
-#   Generate: openssl rand -base64 64 | tr -d '\n'
+# JWT Secret (generate with: openssl rand -base64 64 | tr -d '\n')
+jwt.secret=YOUR_BASE64_SECRET
 
-mvn spring-boot:run
-# Backend runs at http://localhost:8080
+# GROQ AI (get free key at https://console.groq.com)
+ai.provider=groq
+ai.groq.api-key=gsk_YOUR_GROQ_KEY
+ai.groq.model=llama-3.3-70b-versatile
 ```
 
----
+#### Step 3: Run Backend
+```bash
+cd backend
+mvn spring-boot:run
+# Runs at http://localhost:8080
+```
 
-### 3. Frontend Setup
-
+#### Step 4: Run Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
-# Frontend runs at http://localhost:3000
+# Runs at http://localhost:3000
 ```
-
-Open http://localhost:3000 and register a new account.
 
 ---
 
-## 🔑 Getting Free API Keys
+## 🔑 Getting Free AI API Keys
 
-### GROQ (Recommended — Fastest)
-1. Go to https://console.groq.com
-2. Sign up (free, no credit card)
-3. Create API key
-4. Set in `application.properties`:
-   ```
+### GROQ (Recommended — Fastest, Completely Free)
+1. Sign up at [https://console.groq.com](https://console.groq.com)
+2. Create an API key (no credit card required)
+3. Set in `application.properties`:
+   ```properties
    ai.provider=groq
    ai.groq.api-key=gsk_xxxxx
+   ai.groq.model=llama-3.3-70b-versatile
    ```
-5. Model: `llama3-70b-8192` — 14,400 free requests/day
+4. Free tier: 14,400 requests/day, 6,000 tokens/minute
 
-### NVIDIA NIM (Alternative)
-1. Go to https://build.nvidia.com
-2. Sign up → get $25 free credits
-3. Create API key
-4. Set in `application.properties`:
-   ```
+### NVIDIA NIM (Alternative — Free Credits)
+1. Sign up at [https://build.nvidia.com](https://build.nvidia.com)
+2. Receive $25 free inference credits
+3. Set in `application.properties`:
+   ```properties
    ai.provider=nvidia
    ai.nvidia.api-key=nvapi_xxxxx
+   ai.nvidia.model=meta/llama-3.1-70b-instruct
    ```
-5. Model: `meta/llama-3.1-70b-instruct`
 
 ---
 
-## 🗄️ Database Schema
+## 🔄 Application Flow
 
 ```
-users
-  id, name, email, password, is_active, created_at, updated_at
-
-generation_sessions
-  id, user_id (FK), job_role, technology, experience_level,
-  categories, question_count, created_at
-
-questions
-  id, session_id (FK), question (TEXT), hint (TEXT),
-  category, difficulty, job_role, technology, experience_level, created_at
-
-user_favorites
-  id, user_id (FK), question_id (FK), created_at
-```
-
----
-
-## 📡 API Endpoints
-
-| Method | Endpoint                        | Auth | Description                  |
-|--------|---------------------------------|------|------------------------------|
-| POST   | `/api/auth/register`            | ❌   | Register                     |
-| POST   | `/api/auth/login`               | ❌   | Login → JWT                  |
-| GET    | `/api/auth/me`                  | ✅   | Current user                 |
-| POST   | `/api/questions/generate`       | ✅   | AI question generation       |
-| GET    | `/api/questions/history`        | ✅   | Paginated session history    |
-| GET    | `/api/questions/session/{id}`   | ✅   | Session + questions          |
-| DELETE | `/api/questions/session/{id}`   | ✅   | Delete session               |
-| GET    | `/api/questions/search`         | ✅   | Search/filter questions      |
-| POST   | `/api/favorites/{questionId}`   | ✅   | Add to favorites             |
-| DELETE | `/api/favorites/{questionId}`   | ✅   | Remove from favorites        |
-| GET    | `/api/favorites`                | ✅   | Get paginated favorites      |
-| GET    | `/api/reference/job-roles`      | ✅   | Job roles list               |
-| GET    | `/api/reference/technologies`   | ✅   | Technologies list            |
-
----
-
-## 🤖 AI Prompt Engineering
-
-The `PromptBuilder` service constructs structured prompts that produce consistent output across any LLM:
-
-- **System role priming** — Model is positioned as a "senior technical interviewer"
-- **Explicit JSON schema** — Forces structured output with exact field names
-- **Per-category distribution rules** — Technical, Coding, SQL, HR, Aptitude guidelines
-- **Experience calibration** — Fresher / Intermediate / Experienced guidance blocks
-- **Difficulty anchoring** — Easy (recall), Medium (application), Hard (design/optimisation)
-- **Anti-hallucination guardrails** — No filler, no duplicates, real-world relevance
-
----
-
-## 📁 Project Structure
-
-```
-interview-gen-project/
-├── backend/
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/com/nexoraa/interviewgen/
-│       │   ├── InterviewGenApplication.java
-│       │   ├── config/         AppConfig.java
-│       │   ├── controller/     Auth, Question, Favorite, Reference
-│       │   ├── dto/            Dto.java (nested static DTOs)
-│       │   ├── entity/         User, GenerationSession, Question, UserFavorite
-│       │   ├── exception/      AppException, GlobalExceptionHandler
-│       │   ├── repository/     4 Spring Data JPA repos
-│       │   ├── security/       SecurityConfig, JwtUtil, JwtAuthFilter
-│       │   └── service/        Auth, Question, Favorite, AiClient, PromptBuilder
-│       └── resources/
-│           └── application.properties
-├── frontend/
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── index.html
-│   └── src/
-│       ├── App.jsx
-│       ├── main.jsx
-│       ├── components/layout/  AppLayout
-│       ├── hooks/              useAuth
-│       ├── pages/              Login, Register, Dashboard, Generate, Session, History, Favorites
-│       ├── services/           api.js
-│       └── styles/             design-tokens.css, global.css
-└── docs/
-    ├── schema.sql
-    ├── CLAUDE_CODE_PROMPT.md
-    └── README.md  ← this file
+User visits / → Landing Page
+                    ↓
+             Register / Login
+                    ↓
+              Dashboard
+              (stats + recent sessions)
+                    ↓
+            Generate Page
+            (select role, tech, level, categories, count)
+                    ↓
+           AI generates questions
+           (PromptBuilder → AiClient → GROQ/NVIDIA)
+                    ↓
+            Session Page (Review Mode)
+            - Browse questions
+            - Filter by category/difficulty
+            - Search
+            - Star favorites
+            - Export to PDF
+                    ↓
+            Practice Mode (optional)
+            - Timer starts
+            - Type answers (paste blocked)
+            - Tab switches tracked
+                    ↓
+            Submit Assessment
+            - AI scores each answer 0-10
+            - Flags AI-generated responses
+            - Overall score 0-100
+            - Detailed feedback per question
+                    ↓
+            Results saved to session
+            Score appears in History
 ```
 
 ---
 
-## 🎨 Design System
+## 🛡️ Security Implementation
 
-Frontend uses the **Ample Market Minimal** design system:
-- Primary: `#111111` (ink black)
-- Neutral: `#F6F5F3` (warm off-white background)
-- Surface: `#FFFFFF` (cards)
-- Card accent: `#FFEF99` (warm yellow highlight)
-- Typography: Inter (Google Fonts) — negative letter-spacing editorial feel
-- Shape: 8–16px radii, flat hierarchy, minimal shadows
+- **Password storage:** BCrypt hashing via Spring Security's `BCryptPasswordEncoder`
+- **Authentication:** JWT signed with HMAC-SHA256 using a 256-bit Base64-encoded secret
+- **Authorization:** `JwtAuthFilter` (extends `OncePerRequestFilter`) validates token on every request
+- **Stateless:** `SessionCreationPolicy.STATELESS` — no server-side sessions
+- **CORS:** Configured via `CorsConfigurationSource` bean, restricted to `localhost:3000` and `localhost:5173`
+- **Input Validation:** Jakarta Bean Validation (`@NotBlank`, `@Email`, `@Min`, `@Max`, `@Pattern`) on all DTOs
+- **Error handling:** `GlobalExceptionHandler` with `@RestControllerAdvice` catches `AppException`, validation errors, and generic exceptions — never leaks stack traces to client
+- **Data isolation:** All queries filter by `user_id` extracted from JWT — users can never access other users' data
 
 ---
 
-## 👨‍💻 Author
+## 📋 Sample Request / Response
 
-Submitted by: [YOUR NAME]  
-GitHub: https://github.com/YOUR_USERNAME/interviewgen  
-Email: your@email.com
+### Generate Questions
+```json
+POST /api/questions/generate
+Authorization: Bearer <token>
+{
+  "jobRole": "Backend Developer",
+  "technology": "Spring Boot",
+  "experienceLevel": "Intermediate",
+  "categories": ["Technical", "Coding", "SQL"],
+  "questionCount": 10
+}
+
+Response 201:
+{
+  "sessionId": 42,
+  "questions": [
+    {
+      "id": 101,
+      "question": "Explain the difference between @RestController and @Controller in Spring Boot. When would you use each?",
+      "hint": "• @RestController = @Controller + @ResponseBody • Use @Controller for MVC views, @RestController for REST APIs • Response body serialization difference",
+      "category": "Technical",
+      "difficulty": "Medium",
+      "technology": "Spring Boot",
+      "jobRole": "Backend Developer",
+      "experienceLevel": "Intermediate",
+      "isFavorite": false
+    }
+  ]
+}
+```
+
+---
+
+## 🐳 Docker Support
+
+The project includes a production-ready `Dockerfile` for the backend and a `docker-compose.yml` for local orchestration:
+
+```yaml
+# docker-compose.yml orchestrates:
+# - MySQL 8 (with healthcheck)
+# - Spring Boot Backend (waits for MySQL to be healthy)
+
+docker-compose up -d
+# MySQL available at localhost:3306
+# Backend available at localhost:8080
+```
+
+> Note: Frontend is not containerized (runs via `npm run dev` for development). For production, build with `npm run build` and serve the `dist/` directory.
+
+---
+
+## 📸 Application Screenshots
+
+### Landing Page
+![Landing Page](docs/images/landing_page.png)
+
+### Dashboard
+![Dashboard](docs/images/dashboard.png)
+
+### Session Review & Feedback
+![Session Review](docs/images/session_review.png)
+
+### Practice Mode
+![Practice Mode](docs/images/practice_mode.png)
+
+| Page | Description |
+|---|---|
+| Landing Page | Marketing page with hero, features, and CTA |
+| Login / Register | Auth cards with demo login option |
+| Dashboard | Stats (sessions, questions, favorites) + recent sessions |
+| Generate Page | Configuration form with all selectors and sliders |
+| Session — Review Mode | Question grid with filters, search, favorites, export |
+| Session — Practice Mode | Full-screen timed mode with answer input |
+| Session — Assessment Results | AI score ring, overall feedback, per-question breakdown |
+| History Page | Paginated session list with AI scores and delete |
+| Favorites Page | Saved questions grid with search |
+
+---
+
+## ⚠️ Known Limitations & Notes
+
+- The AI generation timeout is set to **55 seconds** — large question counts (25+) may occasionally approach this limit on free GROQ tier
+- The `assessment_data` column stores the full AI assessment as a JSON string in the `TEXT` column — suitable for the scale of this application
+- CORS is currently configured for localhost origins only; update `app.cors.allowed-origins` for production deployment
+- The JWT secret in `application.properties` should **never** be committed to a public repository in production — use environment variables
+
+---
+
+## 📄 License
+
+This project was built as a technical assessment submission for Nexoraa Technosolve IT Services Pvt. Ltd. and is not licensed for commercial use.
+
+---
+
+*Built with ❤️ using Java Spring Boot, React.js, and free AI APIs.*
