@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://h55n.vercel.app">Live Demo</a> | <a href="https://github.com/h55n/orator">GitHub Repo</a> | <a href="#-setup-instructions">Installation</a>
+  <a href="https://orator-ai.vercel.app">Live Demo</a> | <a href="https://github.com/h55n/orator">GitHub Repo</a> | <a href="#-setup-instructions">Installation</a>
 </p>
 
 <p align="center">
