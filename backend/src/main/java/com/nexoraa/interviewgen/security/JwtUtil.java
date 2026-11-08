@@ -1,6 +1,7 @@
 package com.nexoraa.interviewgen.security;
 
 import io.jsonwebtoken.*;
+import jakarta.annotation.PostConstruct;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +22,22 @@ public class JwtUtil {
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
+    private SecretKey signingKey;
+
+    @PostConstruct
+    void initializeSigningKey() {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("Set JWT_SECRET to a private Base64-encoded key of at least 32 bytes");
+        }
+        try {
+            signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException("JWT_SECRET must be valid Base64 encoding at least 32 key bytes");
+        }
+    }
+
     private SecretKey key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        return signingKey;
     }
 
     public String generateToken(String email) {

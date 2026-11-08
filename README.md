@@ -470,7 +470,7 @@ spring.datasource.username=root
 spring.datasource.password=YOUR_MYSQL_PASSWORD
 
 # JWT Secret (generate with: openssl rand -base64 64 | tr -d '\n')
-jwt.secret=YOUR_BASE64_SECRET
+JWT_SECRET=YOUR_PRIVATE_BASE64_SECRET
 
 # GROQ AI (get free key at https://console.groq.com)
 ai.provider=groq
@@ -670,3 +670,14 @@ This project was built as a technical assessment submission for Nexoraa Technoso
 ---
 
 *Built with ❤️ using Java Spring Boot, React.js, and free AI APIs.*
+
+### JWT signing key required
+
+Set `JWT_SECRET` in the backend environment before starting it or Docker Compose.
+Use a private Base64-encoded random key containing at least 32 decoded bytes.
+There is no default key. Missing, malformed or short keys stop backend startup.
+Do not put the key in frontend environment files, source control or logs.
+
+The previous repository key was public. Any deployment that used it must replace
+it; changing the key invalidates existing login tokens. This source change does
+not rotate a deployed secret or remove it from Git history.
