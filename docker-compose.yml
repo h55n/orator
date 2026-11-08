@@ -36,7 +36,7 @@ services:
       AI_GROQ_MODEL: llama-3.3-70b-versatile
       AI_GROQ_MAX_TOKENS: "4096"
       AI_GROQ_TEMPERATURE: "0.7"
-      JWT_SECRET: dGhpcyBpcyBhIHNlY3VyZSByYW5kb20gc2VjcmV0IGtleSBmb3IgaW50ZXJ2aWV3Z2VuIGFwcA==
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET to a private Base64-encoded key of at least 32 bytes}
       JWT_EXPIRATION_MS: "86400000"
       APP_CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
     depends_on:
