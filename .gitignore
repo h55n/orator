@@ -29,3 +29,6 @@ application-prod.properties
 # ── Logs ─────────────────────────────────────
 *.log
 logs/
+
+# Local Compose environment
+.env

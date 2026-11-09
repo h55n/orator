@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/DOCS-H55N.VERCEL.APP-ffd700?style=for-the-badge" alt="Docs">
   <img src="https://img.shields.io/badge/FRAMEWORK-SPRING_BOOT-6D4AE3?style=for-the-badge" alt="Spring Boot">
   <img src="https://img.shields.io/badge/FRONTEND-REACT-61DAFB?style=for-the-badge" alt="React">
-  <img src="https://img.shields.io/badge/DATABASE-MYSQL-4479A1?style=for-the-badge" alt="MySQL">
+  <img src="https://img.shields.io/badge/DATABASE-POSTGRESQL-4169E1?style=for-the-badge" alt="MySQL">
   <img src="https://img.shields.io/badge/LICENSE-MIT-brightgreen?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/BUILT_BY-HASSAN_REHMAN-8a2be2?style=for-the-badge" alt="Built By">
 </p>
@@ -46,7 +46,7 @@
 
 **Orator** is a full-stack web application that generates AI-driven, targeted interview questions based on a user's selected job role, technology, and experience level. The application goes well beyond the base requirements — it features a polished editorial UI design system, AI-powered self-assessment with cheating detection, practice mode with real-time timers, and a robust Spring Boot REST API secured with JWT authentication.
 
-> Built with Java 17, Spring Boot 3.2, React 18, Vite, MySQL 8, and free AI APIs (GROQ / NVIDIA NIM).
+> Built with Java 17, Spring Boot 3.2, React 18, Vite, PostgreSQL, and free AI APIs (GROQ / NVIDIA NIM).
 
 ---
 
@@ -68,7 +68,7 @@
 | View Previously Generated Questions (History) | ✅ Paginated session history with delete |
 | RESTful APIs using Spring Boot | ✅ 12+ endpoints, all documented below |
 | Responsive User Interface using React.js | ✅ Mobile-first, sidebar collapses on mobile |
-| MySQL Database Integration | ✅ JPA/Hibernate with schema.sql provided |
+| Database integration | PostgreSQL through JPA/Hibernate; legacy MySQL schema retained for reference |
 | Proper Exception Handling and Input Validation | ✅ GlobalExceptionHandler + Bean Validation |
 
 ### 🚀 Extra Features Added Beyond Requirements
@@ -141,7 +141,7 @@
                     └─────────┼──────────────────────────┘
                               │ JDBC
                     ┌─────────▼──────────┐     ┌──────────────────────┐
-                    │    MySQL 8          │     │   GROQ API           │
+                    │    PostgreSQL       │     │   GROQ API           │
                     │  interviewgen_db    │     │   (llama-3.3-70b)    │
                     │                    │     │   OR                  │
                     │  users             │     │   NVIDIA NIM          │
@@ -165,9 +165,9 @@
 | **Icons** | Phosphor Icons for React | Duotone icon set |
 | **HTTP Client (FE)** | Axios | JWT interceptor, 401 auto-redirect |
 | **HTTP Client (BE)** | Spring WebFlux WebClient | Non-blocking AI API calls |
-| **Database** | MySQL 8 | InnoDB, UTF8MB4, fulltext index |
+| **Database** | PostgreSQL 16 | PostgreSQL JDBC driver; tables managed by Hibernate |
 | **ORM** | Spring Data JPA + Hibernate | `ddl-auto=update` |
-| **Containerization** | Docker + Docker Compose | MySQL + Backend orchestrated |
+| **Containerization** | Docker + Docker Compose | PostgreSQL + backend orchestrated |
 | **Build Tool** | Maven 3.8+ | Spring Boot Maven Plugin |
 | **Version Control** | Git + GitHub | Public repository |
 
@@ -421,69 +421,56 @@ The app shell is a **floating card** design — a centered rounded container (`b
 
 ### Prerequisites
 - Java 17+
-- Node.js 18+
-- MySQL 8+ (or Docker)
+- Node.js 22+
+- PostgreSQL 16 (or Docker with Compose v2)
 - Maven 3.8+
-- A free GROQ API key from [https://console.groq.com](https://console.groq.com)
+- A GROQ API key only when using AI generation; auth and history can run without it
 
----
-
-### Option A — Docker Compose (Recommended)
+### Option A - Docker Compose
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/orator.git
+git clone https://github.com/h55n/orator.git
 cd orator
 
-# 2. Set your GROQ API key
-export GROQ_API_KEY=gsk_your_key_here
+# Set private values in your local environment. Do not commit them.
+export JWT_SECRET="$(openssl rand -base64 64 | tr -d '\n')"
+export POSTGRES_PASSWORD="$(openssl rand -hex 32)"
+# Optional for AI generation:
+# export GROQ_API_KEY=...
 
-# 3. Start MySQL + Backend
-docker-compose up -d
-
-# 4. Start Frontend
+docker compose up -d --build
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open http://localhost:3000. The backend is published at http://localhost:8080,
+mapped to its container listener on port 7860. PostgreSQL is internal to the Compose
+network and is not published on the host. Hibernate creates the PostgreSQL tables.
 
----
+This uses a new `postgres_data` volume. The old MySQL volume is not reused or
+migrated, and the legacy `docs/schema.sql` is MySQL-only. Keep existing data backed
+up and plan a migration separately; do not run `docker compose down --volumes`
+against a database you need to keep.
 
-### Option B — Manual Setup
+### Option B - Manual Setup
 
-#### Step 1: Database Setup
-```sql
--- In MySQL Workbench or CLI:
-mysql -u root -p < docs/schema.sql
-```
+Create a PostgreSQL database and role using your local PostgreSQL administration
+account, then provide their details to the backend through environment variables:
 
-#### Step 2: Backend Configuration
-
-Edit `backend/src/main/resources/application.properties`:
-
-```properties
-# Database
-spring.datasource.url=jdbc:mysql://localhost:3306/interviewgen_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=YOUR_MYSQL_PASSWORD
-
-# JWT Secret (generate with: openssl rand -base64 64 | tr -d '\n')
-JWT_SECRET=YOUR_PRIVATE_BASE64_SECRET
-
-# GROQ AI (get free key at https://console.groq.com)
-ai.provider=groq
-ai.groq.api-key=gsk_YOUR_GROQ_KEY
-ai.groq.model=llama-3.3-70b-versatile
-```
-
-#### Step 3: Run Backend
 ```bash
+export DATABASE_URL=jdbc:postgresql://localhost:5432/interviewgen_db
+export DATABASE_USERNAME=orator
+# Set DATABASE_PASSWORD to the password for your local database role.
+export JWT_SECRET="$(openssl rand -base64 64 | tr -d '\n')"
+export SERVER_PORT=8080
+# Optional: export GROQ_API_KEY=...
 cd backend
 mvn spring-boot:run
-# Runs at http://localhost:8080
 ```
+
+With `SERVER_PORT=8080`, the backend matches the frontend development proxy.
+Without that override, the backend's default port is 7860.
 
 #### Step 4: Run Frontend
 ```bash
@@ -610,17 +597,18 @@ Response 201:
 
 ## 🐳 Docker Support
 
-The project includes a production-ready `Dockerfile` for the backend and a `docker-compose.yml` for local orchestration:
+The backend Dockerfile and Compose file provide a local PostgreSQL deployment.
+Set `JWT_SECRET` and `POSTGRES_PASSWORD` before starting it (see setup above).
 
-```yaml
-# docker-compose.yml orchestrates:
-# - MySQL 8 (with healthcheck)
-# - Spring Boot Backend (waits for MySQL to be healthy)
-
-docker-compose up -d
-# MySQL available at localhost:3306
-# Backend available at localhost:8080
+```bash
+docker compose up -d --build
+# Backend: http://localhost:8080
+# PostgreSQL: internal service only, no published database port
 ```
+
+The `Disposable Compose deployment` CI workflow builds the actual image and uses
+a fresh database volume to verify startup, registration, login, profile retrieval,
+empty history, and persisted hashed passwords. It makes no AI generation requests.
 
 > Note: Frontend is not containerized (runs via `npm run dev` for development). For production, build with `npm run build` and serve the `dist/` directory.
 

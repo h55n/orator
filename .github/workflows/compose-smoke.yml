@@ -1,0 +1,47 @@
+name: Disposable Compose deployment
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSE_PROJECT_NAME: orator-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      GROQ_API_KEY: ''
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate disposable test keys
+        run: |
+          python3 - <<'PY'
+          import base64, os, secrets
+          jwt = base64.b64encode(secrets.token_bytes(64)).decode()
+          database = secrets.token_urlsafe(32)
+          print('::add-mask::' + jwt)
+          print('::add-mask::' + database)
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write('JWT_SECRET=' + jwt + '\nPOSTGRES_PASSWORD=' + database + '\n')
+          PY
+      - name: Validate and build Compose
+        run: |
+          docker compose config --quiet
+          docker compose build
+      - name: Start isolated backend and database
+        run: docker compose up -d --wait --wait-timeout 180
+      - name: Exercise real database-backed auth through host port
+        run: python3 tests/compose_smoke.py
+      - name: Verify database rows and password hashing
+        run: |
+          count=$(docker compose exec -T postgres psql -U orator -d interviewgen_db -tA <<'SQL'
+          SELECT count(*) FROM users WHERE email LIKE 'compose-%@example.invalid' AND password LIKE '$2%';
+          SQL
+          )
+          test "$count" = 1
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Remove disposable containers and volumes
+        if: always()
+        run: docker compose down --volumes --remove-orphans
