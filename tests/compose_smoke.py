@@ -26,7 +26,7 @@ for attempt in range(90):
     try:
         request("/api/auth/login", {"email": "missing@example.invalid", "password": "not-a-user"}, expected=401)
         break
-    except (URLError, TimeoutError, AssertionError):
+    except (URLError, TimeoutError, ConnectionError, AssertionError):
         time.sleep(2)
 else:
     raise AssertionError("Backend did not become ready through published port 8080")
