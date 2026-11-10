@@ -421,7 +421,7 @@ The app shell is a **floating card** design — a centered rounded container (`b
 
 ### Prerequisites
 - Java 17+
-- Node.js 22+
+- Node.js 22.12+ (or 20.19+)
 - PostgreSQL 16 (or Docker with Compose v2)
 - Maven 3.8+
 - A GROQ API key only when using AI generation; auth and history can run without it
