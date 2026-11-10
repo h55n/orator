@@ -2,11 +2,12 @@ const {spawn}=require('node:child_process')
 const assert=require('node:assert/strict')
 const {chromium}=require('playwright')
 const origin='http://127.0.0.1:3240'
+const development=process.argv.includes('--dev')
 ;(async()=>{
- const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port','3240','--strictPort'],{stdio:'ignore'})
+ const server=spawn(process.execPath,['node_modules/vite/bin/vite.js',...(development?[]:['preview']),'--host','127.0.0.1','--port','3240','--strictPort'],{stdio:'ignore',env:{...process.env,VITE_API_URL:'/api'}})
  let browser
  try{
-  let ready=false;for(let i=0;i<100;i++){try{await fetch(origin);ready=true;break}catch{await new Promise(r=>setTimeout(r,100))}}assert.ok(ready,'production preview starts')
+  let ready=false;for(let i=0;i<100;i++){try{await fetch(origin);ready=true;break}catch{await new Promise(r=>setTimeout(r,100))}}assert.ok(ready,development?'development server starts':'production preview starts')
   browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})})
   const page=await browser.newPage({viewport:{width:1280,height:900}})
   const errors=[],requests=[];page.on('pageerror',e=>errors.push(e.message))
@@ -38,7 +39,7 @@ const origin='http://127.0.0.1:3240'
   await page.getByRole('link',{name:'Generate',exact:true}).click();await page.getByRole('heading',{name:'Configure Your Session'}).waitFor()
   if(process.env.SCREENSHOT_DIR)await page.screenshot({path:process.env.SCREENSHOT_DIR+'/orator-generate.png',fullPage:true})
   await page.reload();await page.getByRole('heading',{name:'Configure Your Session'}).waitFor();assert.ok(requests.some(r=>r.path==='/api/auth/me'&&r.auth==='Bearer synthetic-test-token'),'reload validates fixture token')
-  rejectHistory=true;await page.getByRole('link',{name:'History',exact:true}).click();await page.waitForURL('**/login');await page.getByRole('heading',{name:'Welcome back'}).waitFor();assert.equal(await page.evaluate(()=>localStorage.getItem('token')),null);assert.equal(await page.evaluate(()=>localStorage.getItem('user')),null)
+  rejectHistory=true;await page.getByRole('link',{name:'History',exact:true}).click();await page.getByRole('heading',{name:'Welcome back'}).waitFor();assert.equal(new URL(page.url()).pathname,'/login');assert.equal(await page.evaluate(()=>localStorage.getItem('token')),null);assert.equal(await page.evaluate(()=>localStorage.getItem('user')),null)
   assert.deepEqual(errors,[])
   console.log('PASS public pages, protected redirect, Axios login JSON/auth header, authenticated navigation, reload auth, 401 token clearing. Synthetic browser API fixtures only; no backend/DB/provider calls.')
  }finally{if(browser)await browser.close();server.kill()}

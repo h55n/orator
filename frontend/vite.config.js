@@ -14,6 +14,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    // Keep the browser targets used before the Vite upgrade.
+    target: ['chrome87', 'edge88', 'firefox78', 'safari14'],
     sourcemap: false,
   }
 })
