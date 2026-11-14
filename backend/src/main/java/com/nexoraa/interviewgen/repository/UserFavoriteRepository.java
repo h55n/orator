@@ -18,7 +18,7 @@ public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long
     @Query("""
         SELECT uf FROM UserFavorite uf
         JOIN FETCH uf.question q
-        WHERE uf.user.id = :userId
+        WHERE uf.user.id = :userId AND q.session.user.id = :userId
         ORDER BY uf.createdAt DESC
         """)
     Page<UserFavorite> findByUserIdWithQuestion(@Param("userId") Long userId, Pageable pageable);

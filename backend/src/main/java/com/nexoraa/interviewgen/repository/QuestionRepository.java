@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findBySessionId(Long sessionId);
+
+    Optional<Question> findByIdAndSessionUserId(Long id, Long userId);
 
     @Query("""
         SELECT q FROM Question q

@@ -21,11 +21,11 @@ public class FavoriteService {
     @Transactional
     public void addFavorite(Long questionId, String email) {
         User user = getUser(email);
+        Question question = questionRepo.findByIdAndSessionUserId(questionId, user.getId())
+                .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
         if (favoriteRepo.existsByUserIdAndQuestionId(user.getId(), questionId)) {
             throw new AppException("Already in favorites", HttpStatus.CONFLICT);
         }
-        Question question = questionRepo.findById(questionId)
-                .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
         favoriteRepo.save(UserFavorite.builder().user(user).question(question).build());
     }
 
